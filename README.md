@@ -1,7 +1,5 @@
 # RobotArm
 
-Controle de braço mecânico de 4 eixos com ESP32, utilizando servos SG90/MG90S controlados via PWM (driver LEDC do ESP-IDF) e 2 joysticks analógicos KY-023.
-
 ---
 
 ## 📋 Descrição
@@ -14,10 +12,10 @@ Projeto de sistemas embarcados desenvolvido com **ESP32-WROVER** e **ESP-IDF**, 
 
 | Componente | Quantidade | Observação |
 |---|---|---|
-| ESP32-WROVER (ou DevKit V1) | 1 | Chip ESP32 |
-| Servo SG90 / MG90S | 4 | Alimentação 5V externa |
+| ESP32-WROVER | 1 | Chip ESP32 |
+| Servo SG90 / MG995 / MG996R | 4 | Alimentação 5V externa |
 | Joystick analógico KY-023 | 2 | Saída 0–3.3V |
-| Fonte 5V (≥ 2A) | 1 | Para alimentação dos servos |
+| Fonte 5V 4.1A | 1 | Para alimentação dos servos |
 
 ### Pinagem
 
@@ -25,10 +23,10 @@ Projeto de sistemas embarcados desenvolvido com **ESP32-WROVER** e **ESP-IDF**, 
 
 | Servo | GPIO | Canal LEDC |
 |---|---|---|
-| servo_am (amarelo) | 27 | LEDC_CHANNEL_0 |
-| servo_roxo | 26 | LEDC_CHANNEL_1 |
-| servo1 | 25 | LEDC_CHANNEL_2 |
-| servo2 | 14 | LEDC_CHANNEL_3 |
+| servo_am (amarelo) | 14 | LEDC_CHANNEL_0 |
+| servo_roxo | 25 | LEDC_CHANNEL_1 |
+| servo1 | 26 | LEDC_CHANNEL_2 |
+| servo2 | 27 | LEDC_CHANNEL_3 |
 
 **Joysticks (entrada ADC1):**
 
@@ -38,8 +36,6 @@ Projeto de sistemas embarcados desenvolvido com **ESP32-WROVER** e **ESP-IDF**, 
 | Joystick 1 | Y → servo_roxo | 32 | ADC_CHANNEL_4 |
 | Joystick 2 | X → servo1 | 39 | ADC_CHANNEL_3 |
 | Joystick 2 | Y → servo2 | 36 | ADC_CHANNEL_0 |
-
-> ⚠️ **Importante:** GPIOs 34, 35, 36 e 39 são *input-only* no ESP32 — usados exclusivamente para leitura ADC (joysticks). Nunca use esses pinos para saída (servos).
 
 ### Diagrama de alimentação
 
@@ -53,7 +49,7 @@ Fonte 5V (-) ──┬── GND servo_am
                ├── GND servo_roxo
                ├── GND servo1
                ├── GND servo2
-               └── GND ESP32        ← terra comum obrigatório
+               └── GND ESP32     
 ```
 
 ---
@@ -100,13 +96,9 @@ main/
 
 ### Zona morta do joystick
 
-O centro analógico do joystick (valor ADC ~2048) possui ruído elétrico natural. Uma zona morta de ±100 counts é aplicada para travar o servo quando o stick está solto:
+O centro analógico do joystick (valor ADC ~2048) possui ruído elétrico natural. Uma zona morta de ±500 counts é aplicada para travar o servo quando o stick está solto:
 
 ```
-ADC bruto: 1948 a 2148 → forçado para 2048 (90° no servo)
-Fora dessa faixa → mapeado linearmente para 0–180°
-```
-
 ---
 
 ## 🚀 Como compilar e gravar
@@ -152,18 +144,6 @@ RobotArm/
 ├── sdkconfig
 └── README.md
 ```
-
----
-
-## 🔮 Melhorias futuras
-
-- Controle incremental via joystick (velocidade em vez de posição absoluta)
-- Tasks FreeRTOS separadas para leitura de joystick e controle de servo
-- Gravação e reprodução de sequências de posições
-- Interface de controle via Wi-Fi (WebSocket + JSON)
-- Cinemática inversa para controle por coordenadas cartesianas
-
----
 
 ## 📄 Licença
 
