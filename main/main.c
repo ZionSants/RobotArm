@@ -61,9 +61,19 @@ void servo_init(Servo *s) {
     ledc_channel_config(&canal);
 }
 
-void servo_set_graus(Servo *s, int graus) {
-    if (graus < 0)   graus = 0;
-    if (graus > 180) graus = 180;
+// Define limites por servo
+#define BASE_MIN    50
+#define BASE_MAX    130
+#define OMBRO_MIN   50
+#define OMBRO_MAX   130
+#define PULSO_MIN   0
+#define PULSO_MAX   180
+#define GARRA_MIN   0    // fechada
+#define GARRA_MAX   180    // aberta
+
+void servo_set_graus(Servo *s, int graus, int min, int max) {
+    if (graus < min) graus = min;
+    if (graus > max) graus = max;
     s->angulo_atual = graus;
     uint32_t duty = graus_para_duty(graus);
     ledc_set_duty(LEDC_LOW_SPEED_MODE, s->canal, duty);
@@ -115,10 +125,10 @@ void app_main(void) {
         int graus_j2x = zonaMorta(JOY2_X_CHANNEL);
         int graus_j2y = zonaMorta(JOY2_Y_CHANNEL);
 
-        servo_set_graus(&servoBase, graus_j1y);
-        servo_set_graus(&servoOmbro, graus_j1x);
-        servo_set_graus(&servoPulso, graus_j2x);
-        servo_set_graus(&servoGarra, graus_j2y);
+        servo_set_graus(&servoBase,   graus_j1y, BASE_MIN,  BASE_MAX);
+        servo_set_graus(&servoOmbro,  graus_j1x, OMBRO_MIN, OMBRO_MAX);
+        servo_set_graus(&servoPulso,  graus_j2x, PULSO_MIN, PULSO_MAX);
+        servo_set_graus(&servoGarra,  graus_j2y, GARRA_MIN, GARRA_MAX);
 
         printf("J1 X:%d Y:%d | J2 X:%d Y:%d\n",
                graus_j1x, graus_j1y, graus_j2x, graus_j2y);
