@@ -26,10 +26,11 @@ typedef struct {
     int angulo_atual;
 } Servo;
 
-Servo servo_am   = { .gpio = 14, .canal = LEDC_CHANNEL_0, .angulo_atual = 90 };
-Servo servo_roxo = { .gpio = 25, .canal = LEDC_CHANNEL_1, .angulo_atual = 90 };
-Servo servo1     = { .gpio = 26, .canal = LEDC_CHANNEL_2, .angulo_atual = 90 };
-Servo servo2     = { .gpio = 27, .canal = LEDC_CHANNEL_3, .angulo_atual = 90 };
+Servo servoBase = { .gpio = 14, .canal = LEDC_CHANNEL_0, .angulo_atual = 90 };
+Servo servoOmbro = { .gpio = 25, .canal = LEDC_CHANNEL_1, .angulo_atual = 90 };
+// Servo servoCotovelo = { .gpio = 26, .canal = LEDC_CHANNEL_2, .angulo_atual = 90 };
+Servo servoPulso = { .gpio = 26, .canal = LEDC_CHANNEL_2, .angulo_atual = 90 };
+Servo servoGarra = { .gpio = 27, .canal = LEDC_CHANNEL_3, .angulo_atual = 90 };
 
 adc_oneshot_unit_handle_t adc_handle;
 
@@ -84,7 +85,7 @@ void joystick_init(void) {
     adc_oneshot_config_channel(adc_handle, JOY2_Y_CHANNEL, &chan_config);
 }
 
-int ler_eixo_com_zona_morta(adc_channel_t canal) {
+int zonaMorta(adc_channel_t canal) {
     int raw = 0;
     adc_oneshot_read(adc_handle, canal, &raw);
 
@@ -100,24 +101,24 @@ int ler_eixo_com_zona_morta(adc_channel_t canal) {
 void app_main(void) {
     joystick_init();
 
-    servo_init(&servo_am);
-    servo_init(&servo_roxo);
-    servo_init(&servo1);
-    servo_init(&servo2);
+    servo_init(&servoBase);
+    servo_init(&servoOmbro);
+    servo_init(&servoPulso);
+    servo_init(&servoGarra);
 
     while (1) {
-        // Joystick 1 -> servo_am (X) e servo_roxo (Y)
-        int graus_j1x = ler_eixo_com_zona_morta(JOY1_X_CHANNEL);
-        int graus_j1y = ler_eixo_com_zona_morta(JOY1_Y_CHANNEL);
+        // Joystick 1 -> servoBase (X) e servoOmbro (Y)
+        int graus_j1x = zonaMorta(JOY1_X_CHANNEL);
+        int graus_j1y = zonaMorta(JOY1_Y_CHANNEL);
 
-        // Joystick 2 -> servo1 (X) e servo2 (Y)
-        int graus_j2x = ler_eixo_com_zona_morta(JOY2_X_CHANNEL);
-        int graus_j2y = ler_eixo_com_zona_morta(JOY2_Y_CHANNEL);
+        // Joystick 2 -> servoPulso (X) e servoGarra (Y)
+        int graus_j2x = zonaMorta(JOY2_X_CHANNEL);
+        int graus_j2y = zonaMorta(JOY2_Y_CHANNEL);
 
-        servo_set_graus(&servo_am,   graus_j1x);
-        servo_set_graus(&servo_roxo, graus_j1y);
-        servo_set_graus(&servo1,     graus_j2x);
-        servo_set_graus(&servo2,     graus_j2y);
+        servo_set_graus(&servoBase, graus_j1y);
+        servo_set_graus(&servoOmbro, graus_j1x);
+        servo_set_graus(&servoPulso, graus_j2x);
+        servo_set_graus(&servoGarra, graus_j2y);
 
         printf("J1 X:%d Y:%d | J2 X:%d Y:%d\n",
                graus_j1x, graus_j1y, graus_j2x, graus_j2y);
