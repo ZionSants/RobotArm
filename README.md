@@ -145,12 +145,4 @@ RobotArm/
 └── README.md
 ```
 
-## 📄 Licença
 
-MIT License — veja o arquivo [LICENSE](LICENSE) para detalhes.
-
----
-
-## 👤 Autor
-
-**Zion Santos** — [@ZionSants](https://github.com/ZionSants)
